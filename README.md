@@ -20,7 +20,7 @@
 
 ## 使用方法
 
-### 在 Claude Code / Trae IDE 中
+### 在 Claude Code、Cursor、Trae 或其他支持 Skill/Agent 的 IDE 中
 
 1. 将此仓库放到项目的 `skills/` 目录下
 2. 调用 `paper-explainer` skill
