@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek-R1 - 技术演进复盘（示例）</title>
+    <style>
+        :root {
+            --bg-color: #FdfcF8;
+            --text-main: #454545;
+            --text-muted: #8c8c8c;
+            --accent-blue: #8fa3ad;
+            --accent-green: #9fb3a6;
+            --accent-rust: #c4a29e;
+            --card-bg: #f4f2ef;
+            --code-bg: #f0f0f0;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.9;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-main);
+            font-weight: 600;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 4px solid var(--accent-blue);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: var(--accent-blue);
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 12px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: var(--accent-green);
+        }
+
+        p {
+            margin-bottom: 1.5em;
+            font-size: 1.05em;
+        }
+
+        blockquote {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent-green);
+            margin: 2em 0;
+            padding: 1.5em 20px;
+            font-style: italic;
+            color: var(--text-main);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .img-container {
+            margin: 2.5em 0;
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .img-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: var(--text-muted);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background-color: rgba(0,0,0,0.05);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5em;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 0.6em;
+        }
+
+        li::marker {
+            color: var(--accent-rust);
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 3em 0;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: var(--accent-blue);
+            font-size: 0.85em;
+            margin-right: 6px;
+        }
+
+        .checklist {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 4px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: var(--card-bg);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(143, 163, 173, 0.05);
+        }
+
+        .metric-highlight {
+            color: #d35f5f;
+            font-weight: 600;
+        }
+
+        .metric-success {
+            color: #5a9e6f;
+            font-weight: 600;
+        }
+
+        .section-number {
+            color: var(--accent-rust);
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .info-box {
+            background: rgba(143, 163, 173, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .warning-box {
+            background: rgba(196, 162, 158, 0.15);
+            border-left: 4px solid var(--accent-rust);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .success-box {
+            background: rgba(95, 158, 111, 0.1);
+            border-left: 4px solid #5a9e6f;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, rgba(159, 179, 166, 0.1) 0%, rgba(143, 163, 173, 0.1) 100%);
+            border: 1px solid var(--accent-green);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .analogy-box::before {
+            content: "💡 类比";
+            display: block;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 12px;
+        }
+
+        .analogy-title {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .problem-box {
+            background: rgba(211, 95, 95, 0.08);
+            border-left: 4px solid #d35f5f;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .problem-box::before {
+            content: "⚠️ 问题";
+            font-weight: 600;
+            color: #d35f5f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DeepSeek-R1：让 AI 自己学会"想问题"</h1>
+        
+        <p style="color: var(--text-muted); font-size: 1em;">
+            <span class="badge">arXiv:2501.12948v2</span>
+            <span class="badge">DeepSeek</span>
+            <span class="badge">2026.01</span>
+        </p>
+
+        <hr>
+
+        <h2><span class="section-number">Phase 0</span>这技术到底是啥？</h2>
+        
+        <h3>一句话定义</h3>
+        <p>DeepSeek-R1 是一个<strong>完全跳过传统教学，让 AI 在"试错"中自己摸索出推理能力</strong>的方法。它不用人工标注的解题步骤，而是通过强化学习（RL），让模型在一次次尝试中学会怎么思考。</p>
+
+        <div class="analogy-box">
+            <p class="analogy-title">🎯 生活类比：教孩子学数学，不直接教步骤</p>
+            <p>想象一下两种教孩子学数学的方式：</p>
+            <ul>
+                <li><strong>传统方法（SFT）</strong>：老师把解题步骤写得清清楚楚，孩子照着抄——学会了，但不会举一反三</li>
+                <li><strong>DeepSeek-R1 的方法</strong>：老师只告诉孩子"答对了有奖励，答错了没奖励"，让孩子自己尝试——孩子会摸索出各种解题方法，甚至发明老师没教过的技巧</li>
+            </ul>
+        </div>
+
+        <h3>核心价值：解决了什么问题？</h3>
+        <p>这个方法听起来很"佛系"，但它解决了一个核心痛点：</p>
+        <ul>
+            <li><strong>打破人类思维天花板</strong>：传统方法受限于人类怎么思考，AI 只能模仿人类；RL 让 AI 自己探索，可能发现比人类更聪明的思考方式</li>
+            <li><strong>减少人工标注成本</strong>：不用人工写解题步骤，只需要知道"答案对不对"——省了巨量人力</li>
+            <li><strong>自主进化</strong>：模型会自己发展出验证、反思、探索替代方案等高级推理行为</li>
+        </ul>
+
+        <h3>提升了多少？</h3>
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-value">86.7%</div>
+                <div class="stat-label">AIME 准确率</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">超越人类</div>
+                <div class="stat-label">数学竞赛表现</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">自主</div>
+                <div class="stat-label">推理能力</div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2><span class="section-number">Phase 1</span>以前的技术为什么不行？</h2>
+
+        <h3>传统方法 1：Chain-of-Thought Prompting</h3>
+        <p>CoT 就是让模型"一步步想"，比如在 prompt 里写"Let's think step by step"。这个方法有效，但有问题：</p>
+        
+        <div class="problem-box">
+            <p style="margin-top: 8px; margin-bottom: 0;"><strong>CoT 的死穴</strong></p>
+            <ul>
+                <li><strong>依赖人工设计</strong>：prompt 模板是人工写的，带着人类的认知偏差</li>
+                <li><strong>无法探索新方法</strong>：模型被限制在人类设计的框架里，无法发现更优的推理路径</li>
+                <li><strong>上下文浪费</strong>：推理步骤占用了大量 token，留给答案的空间就少了</li>
+            </ul>
+        </div>
+
+        <h3>传统方法 2：监督微调（SFT）</h3>
+        <p>SFT 就是给模型看大量"问题+标准答案"的例子，让它学会怎么解题。这个方法的问题更严重：</p>
+        
+        <div class="problem-box">
+            <p style="margin-top: 8px; margin-bottom: 0;"><strong>SFT 的死穴</strong></p>
+            <ul>
+                <li><strong>标注成本极高</strong>：需要人工写详细的推理步骤，数学题、编程题、逻辑题——每道都要人写</li>
+                <li><strong>受限于人类水平</strong>：模型最多学到人类会的方法，无法超越人类</li>
+                <li><strong>认知偏差</strong>：标注数据带着人类的主观判断，模型会继承这些偏见</li>
+            </ul>
+        </div>
+
+        <h3>传统方法 3：RL + SFT 两阶段训练</h3>
+        <p>有些研究尝试先用 RL 训练推理能力，再用 SFT 对齐人类偏好。这个方法的问题是：</p>
+        <ul>
+            <li><strong>流程复杂</strong>：要分两个阶段训练，中间还要准备数据，工程复杂度高</li>
+            <li><strong>可能互相抵消</strong>：RL 阶段学到的推理能力，可能在 SFT 阶段被"对齐"掉</li>
+        </ul>
+
+        <div class="analogy-box">
+            <p class="analogy-title">🎯 类比：学开车，教练 vs 自己练</p>
+            <ul>
+                <li><strong>CoT</strong>：教练坐在副驾驶，每一步都告诉你怎么开——安全但学不会灵活应变</li>
+                <li><strong>SFT</strong>：给你看 1000 个"完美驾驶视频"，你照着模仿——学会了标准动作，但遇到突发情况不会处理</li>
+                <li><strong>RL</strong>：把你扔到空旷场地，让你自己开，撞了就扣分，开得好就加分——你会摸索出各种技巧，甚至发明新方法</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2><span class="section-number">Phase 2</span>DeepSeek-R1 到底是怎么做到的？</h2>
+
+        <h3>核心思想：一句话</h3>
+        <p>DeepSeek-R1 用<strong>强化学习（RL）</strong>让模型自主学会推理，完全跳过传统的 SFT 阶段。模型在一次次尝试中摸索出解题方法，就像人类在试错中学习。</p>
+
+        <h3>第一步：DeepSeek-R1-Zero（纯 RL 版本）</h3>
+        <p>这是 DeepSeek-R1 的前身，完全用 RL 训练，不用任何人工标注的推理步骤。关键技术是 <strong>GRPO（Group Relative Policy Optimization）</strong>。</p>
+
+        <h4>GRPO 是什么？</h4>
+        <p>GRPO 是 PPO（Proximal Policy Optimization）的简化版。PPO 是 RL 领域的经典算法，但计算开销大。GRPO 通过<strong>分组采样</strong>和<strong>相对策略优化</strong>，把计算量大幅降低。</p>
+        
+        <div class="analogy-box">
+            <p class="analogy-title">🎯 类比：考试，单独改 vs 集体改</p>
+            <p>想象老师批改试卷：</p>
+            <ul>
+                <li><strong>PPO</strong>：每道题单独改，要算每道题的梯度，计算量大</li>
+                <li><strong>GRPO</strong>：把 16 道题分成一组，一起改，只算组的平均梯度——计算量小很多</li>
+            </ul>
+        </div>
+
+        <h4>奖励设计：怎么告诉模型"做得好不好"？</h4>
+        <p>RL 需要一个"奖励信号"告诉模型做得好不好。DeepSeek-R1-Zero 用的是<strong>基于规则的奖励</strong>：</p>
+        <ul>
+            <li><strong>准确性奖励</strong>：答案对不对？数学题有标准答案，编程题能编译运行</li>
+            <li><strong>格式奖励</strong>：推理过程有没有按指定格式写？比如用 <think> 和 <answer> 标签</li>
+        </ul>
+
+        <div class="info-box">
+            <strong>关键设计</strong>：奖励完全基于"答案对不对"，不限制"怎么想"。这给了模型自由探索的空间。
+        </div>
+
+        <h3>训练过程：模型怎么"进化"？</h3>
+        <p>DeepSeek-R1-Zero 的训练过程很有意思：</p>
+        <ul>
+            <li><strong>初始阶段</strong>：模型像一张白纸，什么都不知道</li>
+            <li><strong>探索阶段</strong>：模型尝试各种方法，答错了就调整，答对了就强化</li>
+            <li><strong>"顿悟时刻"</strong>：论文里提到一个有趣的瞬间——模型突然开始频繁用"wait"这个词，说明它学会了"停下来反思"</li>
+            <li><strong>收敛阶段</strong>：模型找到了一套稳定的推理策略，准确率从 15.6% 飙升到 77.9%</li>
+        </ul>
+
+        <h3>第二步：DeepSeek-R1（完整版本）</h3>
+        <p>DeepSeek-R1-Zero 虽然推理能力强，但有问题：</p>
+        <ul>
+            <li><strong>语言混合</strong>：中英文混着来，可读性差</li>
+            <li><strong>专注推理</strong>：只擅长数学、编程等推理任务，写作、问答等一般任务不行</li>
+        </ul>
+        <p>为了解决这些问题，DeepSeek-R1 引入了<strong>多阶段训练框架</strong>：</p>
+
+        <h4>阶段 1：冷启动 + RL</h4>
+        <p>先用少量"冷启动数据"（人类对话式的推理过程）让模型学会"怎么说话"，再用 RL 提升推理能力。</p>
+
+        <h4>阶段 2：拒绝采样 + SFT</h4>
+        <p>用"拒绝采样"过滤掉不合适的回答，再用 SFT 训练，让模型学会写作、问答等一般任务。</p>
+
+        <h4>阶段 3：偏好 RL</h4>
+        <p>最后用<strong>模型奖励</strong>（不是规则奖励）对齐人类偏好，让模型更"有用"和"无害"。</p>
+
+        <div class="analogy-box">
+            <p class="analogy-title">🎯 类比：培养孩子，分阶段</p>
+            <ul>
+                <li><strong>阶段 1</strong>：先让孩子学会"怎么说话"（冷启动）</li>
+                <li><strong>阶段 2</strong>：教孩子"怎么写作文"（SFT）</li>
+                <li><strong>阶段 3</strong>：让孩子学会"怎么帮人"（偏好 RL）</li>
+            </ul>
+        </div>
+
+        <h3>奖励模型：怎么让模型更"有用"？<h3>
+        <p>DeepSeek-R1 用<strong>模型奖励</strong>（不是规则奖励）来对齐人类偏好。训练方法是：</p>
+        <ul>
+            <li>让 DeepSeek-V3（一个强大的模型）生成两个回答</li>
+            <li>问 DeepSeek-V3 "哪个回答更好？"</li>
+            <li>用 DeepSeek-V3 的判断作为奖励信号</li>
+        </ul>
+        <p>这样做的好处是：</p>
+        <ul>
+            <li><strong>不需要人工标注</strong>：让模型自己判断，省了人力</li>
+            <li><strong>能捕捉复杂偏好</strong>：人类偏好很难用规则描述，但模型能学会</li>
+        </ul>
+
+        <div class="img-container">
+            <svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                    </marker>
+                    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#8fa3ad" />
+                    </marker>
+                </defs>
+                <rect width="100%" height="100%" fill="#ffffff" />
+                
+                <style>
+                    .line { fill: none; stroke: #333; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+                    .dashed { stroke-dasharray: 5,5; }
+                    .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; fill: #454545; }
+                    .highlight { stroke: #8fa3ad; stroke-width: 3; }
+                    .accent { fill: #9fb3a6; stroke: none; opacity: 0.2; }
+                    .badge { font-size: 11px; fill: #8fa3ad; font-family: -apple-system, sans-serif; }
+                    .metric { font-size: 11px; fill: #c4a29e; font-family: -apple-system, sans-serif; }
+                    .title { font-size: 16px; font-weight: 600; fill: #454545; }
+                    .box { fill: #f8f8f8; stroke: #ccc; stroke-width: 1; }
+                </style>
+                
+                <text x="400" y="30" text-anchor="middle" class="title">DeepSeek-R1 Training Pipeline</text>
+                
+                <!-- Stage 1: Cold Start + RL -->
+                <rect x="50" y="60" width="200" height="80" class="box" />
+                <text x="150" y="85" text-anchor="middle" class="text">Cold Start Data</text>
+                <text x="150" y="105" text-anchor="middle" class="badge">人类对话式推理</text>
+                <text x="150" y="125" text-anchor="middle" class="metric">+ RL (GRPO)</text>
+                
+                <line x1="250" y1="100" x2="290" y2="100" class="line" marker-end="url(#arrow)" />
+                
+                <!-- Stage 2: Rejection Sampling + SFT -->
+                <rect x="300" y="60" width="200" height="80" class="box" />
+                <text x="400" y="85" text-anchor="middle" class="text">Rejection Sampling</text>
+                <text x="400" y="105" text-anchor="middle" class="badge">过滤不合适回答</text>
+                <text x="400" y="125" text-anchor="middle" class="metric">+ SFT</text>
+                
+                <line x1="500" y1="100" x2="540" y2="100" class="line" marker-end="url(#arrow)" />
+                
+                <!-- Stage 3: Preference RL -->
+                <rect x="550" y="60" width="200" height="80" class="box" style="stroke:#8fa3ad;stroke-width:2" />
+                <text x="650" y="85" text-anchor="middle" class="text">Preference RL</text>
+                <text x="650" y="105" text-anchor="middle" class="badge" style="fill:#8fa3ad">对齐人类偏好</text>
+                <text x="650" y="125" text-anchor="middle" class="metric" style="fill:#8fa3ad">Model Reward</text>
+                
+                <!-- DeepSeek-R1 Output -->
+                <rect x="300" y="200" width="200" height="60" class="box" style="stroke:#5a9e6f;stroke-width:3" />
+                <text x="400" y="225" text-anchor="middle" class="text" style="fill:#5a9e6f">DeepSeek-R1</text>
+                <text x="400" y="245" text-anchor="middle" class="badge" style="fill:#5a9e6f">推理 + 写作 + 安全</text>
+                
+                <!-- Arrows from stages -->
+                <line x1="150" y1="140" x2="400" y2="200" class="line" stroke-width="2" marker-end="url(#arrow-blue)" />
+                <line x1="400" y1="140" x2="400" y2="200" class="line" stroke-width="2" marker-end="url(#arrow-blue)" />
+                <line x1="650" y1="140" x2="400" y2="200" class="line" stroke-width="2" marker-end="url(#arrow-blue)" />
+                
+                <!-- Legend -->
+                <rect x="50" y="300" width="700" height="80" fill="none" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,2" />
+                <text x="400" y="325" text-anchor="middle" class="badge">关键创新</text>
+                <text x="400" y="345" text-anchor="middle" class="text">跳过 SFT，直接用 RL 让模型自主学会推理</text>
+                <text x="400" y="365" text-anchor="middle" class="text">多阶段训练：推理能力 + 语言一致性 + 人类偏好对齐</text>
+            </svg>
+            <div class="caption">图 1：DeepSeek-R1 的多阶段训练流程</div>
+        </div>
+
+        <hr>
+
+        <h2><span class="section-number">Phase 3</span>实验证明了什么？</h2>
+
+        <h3>DeepSeek-R1-Zero 的表现</h3>
+        <p>论文里最震撼的结果是 DeepSeek-R1-Zero 在 AIME 2024 数学竞赛上的表现：</p>
+        <ul>
+            <li><strong>初始准确率</strong>：15.6%（比随机好不了多少）</li>
+            <li><strong>最终准确率</strong>：77.9%（超越人类平均水平）</li>
+            <li><strong>训练步数</strong>：10,400 步（约 1.6 个 epoch）</li>
+        </ul>
+
+        <div class="analogy-box">
+            <p class="analogy-title">🎯 类比：从零开始，自学成才</p>
+            <p>就像一个孩子从没见过数学题，到能参加竞赛拿高分——而且没人教他解题步骤，只是告诉他"答对了有奖励"。</p>
+        </div>
+
+        <h3>"顿悟时刻"：模型学会了"反思"</h3>
+        <p>论文里记录了一个有趣的瞬间：训练到某一步时，模型突然开始频繁用"wait"这个词。</p>
+        
+        <div class="success-box">
+            <p style="margin-top: 8px; margin-bottom: 0;"><strong>这意味着什么？</strong></p>
+            <p>模型学会了"停下来反思"——就像人解题时会说"等等，我再想想"一样。这是模型自主发展出的推理策略，不是人类教的。</p>
+        </div>
+
+        <h3>DeepSeek-R1 的完整表现</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>任务</th>
+                        <th>DeepSeek-R1-Zero</th>
+                        <th>DeepSeek-R1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AIME 2024</td>
+                        <td class="metric-success">77.9%</td>
+                        <td class="metric-success">79.8%</td>
+                    </tr>
+                    <tr>
+                        <td>编程竞赛</td>
+                        <td class="metric-success">超越人类</td>
+                        <td class="metric-success">超越人类</td>
+                    </tr>
+                    <tr>
+                        <td>STEM 领域</td>
+                        <td class="metric-success">超越人类</td>
+                        <td class="metric-success">超越人类</td>
+                    </tr>
+                    <tr>
+                        <td>语言一致性</td>
+                        <td class="metric-highlight">中英混合</td>
+                        <td class="metric-success">大幅改善</td>
+                    </tr>
+                    <tr>
+                        <td>写作能力</td>
+                        <td class="metric-highlight">一般</td>
+                        <td class="metric-success">显著提升</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2><span class="section-number">Phase 4</span>这技术能用吗？有什么限制？</h2>
+
+        <h3>一句话总结</h3>
+        <p><strong>DeepSeek-R1 是一个"自主进化"的推理模型</strong>：它通过强化学习自主学会推理能力，再通过多阶段训练对齐人类偏好，既有强大的推理能力，又适合实际应用。</p>
+
+        <h3>什么时候该考虑用？</h3>
+        <ul>
+            <li>你需要一个推理能力强的模型（数学、编程、逻辑推理）</li>
+            <li>你有大量计算资源（RL 训练成本高）</li>
+            <li>你想探索"超越人类"的推理方法</li>
+        </ul>
+
+        <h3>什么时候不该用？</h3>
+        <ul>
+            <li>你的任务不需要复杂推理（比如简单的问答、摘要）——用 SFT 更快更便宜</li>
+            <li>你的计算资源有限——RL 训练需要大量 GPU</li>
+            <li>你需要完全可控的推理过程——RL 训练的过程是"黑盒"，难以解释</li>
+        </ul>
+
+        <h3>当前局限</h3>
+        <ul>
+            <li>训练成本高——需要大量 GPU 和时间</li>
+            <li>过程不可解释——模型是怎么学会推理的，很难追踪</li>
+            <li>需要强大的基础模型——DeepSeek-V3 本身就很强</li>
+        </ul>
+
+        <h3>未来方向</h3>
+        <ul>
+            <li>更高效的 RL 算法（进一步降低计算成本）</li>
+            <li>探索其他领域的应用（比如视觉推理、多模态推理）</li>
+            <li>提高训练过程的可解释性</li>
+        </ul>
+
+        <hr>
+
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9em;">
+            Generated by <strong>paper-explainer</strong> Skill<br>
+            <span class="badge">arXiv:2501.12948v2</span>
+        </p>
+    </div>
+</body>
+</html>
